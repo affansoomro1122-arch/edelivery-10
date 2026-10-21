@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export SITE2=/home/w5yznj9jl555/public_html/edeliver9.com.au
-    - /bin/cp -R * $SITE2
