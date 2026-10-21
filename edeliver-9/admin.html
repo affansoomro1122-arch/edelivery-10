@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin | SKY Electric Trucks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/STYLE1.CSS">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css" integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+.vrow{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #232323}
+.vth{position:relative;width:72px;aspect-ratio:4/3;background:#111;border:1px solid #333;overflow:hidden}
+.vth img{width:100%;height:100%;object-fit:cover}
+.vth span{position:absolute;inset:0;margin:auto;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:8px;line-height:22px;text-align:center;padding-left:2px}
+.vinfo b{display:block;font-weight:500;font-size:12px}.vinfo small{color:var(--mut);font-size:10px;word-break:break-all}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="page"><div class="wrap">
+
+ <!-- passcode gate -->
+ <div id="gate" class="panel gate" hidden>
+  <h2 style="font-size:20px;margin-bottom:18px">Admin <span class="ac">Login</span></h2>
+  <form id="gf">
+   <div class="fld"><label for="pin">Passcode</label><input id="pin" type="password" autocomplete="current-password" required></div>
+   <button class="btn" type="submit">Enter</button><span class="msg" id="gm" style="color:#ff7a99"></span>
+  </form>
+ </div>
+
+ <!-- dashboard -->
+ <div id="dash" hidden>
+  <div class="crumbs"><a href="/">Home</a> / Admin</div>
+  <h2>Product <span class="ac">Admin</span></h2>
+
+  <div class="adm">
+   <!-- form -->
+   <form class="panel" id="pf" autocomplete="off">
+    <h3 class="t" id="ftitle" style="font-size:15px;margin-bottom:20px">Add New Product</h3>
+    <div class="fld"><label for="name">Product name <em>*</em></label><input id="name" required maxlength="120" placeholder="e.g. LDV Electric Pantech"></div>
+    <div class="fld"><label for="price">Price (AUD) <em>*</em></label><input id="price" type="number" min="0" step="0.01" required placeholder="89000"></div>
+    <div class="fld"><label for="pnote">Price note (optional)</label><input id="pnote" maxlength="80" placeholder="e.g. Plus on-road costs"></div>
+    <div class="fld"><label for="book">Booking amount (optional)</label><input id="book" type="number" min="0" step="0.01" placeholder="e.g. 5000"><p class="hint">Leave empty to hide the booking line on the product page.</p></div>
+    <div class="fld"><label for="desc">Description</label><textarea id="desc" placeholder="Short description shown on the detail page"></textarea></div>
+
+    <div class="fld"><label>Images <em>*</em> (first image is the main one)</label>
+     <input id="files" type="file" accept="image/*" multiple>
+     <div class="urlrow"><input id="imgurl" type="url" placeholder="…or paste an image URL"><button class="xbtn" type="button" id="addurl">Add</button></div>
+     <div class="prev" id="prev"></div>
+     <p class="hint">Click an image to make it the main image. Uploaded images are resized to max 1000px.</p>
+    </div>
+
+    <div class="fld"><label>Videos (optional)</label>
+     <div class="urlrow"><input id="vidurl" type="url" placeholder="Paste a YouTube, Vimeo, Google Drive or video file link"><button class="xbtn" type="button" id="addvid">Add</button></div>
+     <div style="margin-top:10px"><input id="vidfile" type="file" accept="video/mp4,video/webm"><p class="hint">…or upload an MP4/WebM from your computer (max 8 MB, saved on your hosting). For bigger videos, upload to YouTube or Google Drive and paste the link.</p></div>
+     <div id="vids"></div>
+     <input id="vthumb" type="file" accept="image/*" hidden>
+     <p class="hint">Video thumbnails are created automatically. Use “Thumbnail” to choose your own picture.</p>
+    </div>
+
+    <div class="fld"><label>Specifications (shown as a list on cards and a table on the detail page)</label>
+     <div id="specs"></div>
+     <button class="xbtn" type="button" id="addspec" style="margin-top:8px;padding:8px 14px">+ Add spec</button>
+    </div>
+
+    <button class="btn" type="submit" id="savebtn">Save Product</button>
+    <button class="btn line" type="button" id="cancel" hidden>Cancel Edit</button>
+    <span class="msg" id="msg" role="status"></span>
+   </form>
+
+   <!-- list -->
+   <div class="panel">
+    <h3 class="t" style="font-size:15px;margin-bottom:6px">All Products <span id="total" class="ac"></span></h3>
+    <p class="hint" style="margin-bottom:14px">The 3 newest products are shown on the home page. All products appear on the products page. </p>
+    <div class="tools">
+     <button class="xbtn" type="button" id="rst">Reset to default</button>
+     <button class="xbtn" type="button" id="out">Log out</button>
+    </div>
+    <div id="items"></div>
+   </div>
+  </div>
+ </div>
+
+</div></main>
+
+<div id="site-footer"></div>
+
+<script src="app.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, E = SKY.esc;
+  var list = [], images = [], videos = [], thumbFor = -1, editing = null, msgT;
+
+  /* ---------- passcode gate (soft protection only – see notes) ---------- */
+  function show() {
+    var ok = sessionStorage.getItem('skyAdmin') === '1';
+    $('gate').hidden = ok; $('dash').hidden = !ok;
+    if (ok) { draw(); }
+  }
+  $('gf').onsubmit = function (e) {
+    e.preventDefault(); $('gm').textContent = ' Checking…';
+    SKY.login($('pin').value).then(function (r) {
+      if (r.ok) { sessionStorage.setItem('skyAdmin', '1'); $('gm').textContent = ''; show(); }
+      else { $('gm').textContent = ' ' + (r.d.error || 'Wrong passcode.'); }
+    });
+  };
+  $('out').onclick = function () { sessionStorage.removeItem('skyAdmin'); sessionStorage.removeItem('skyPin'); $('pin').value = ''; show(); };
+
+  function say(t) { $('msg').textContent = t; clearTimeout(msgT); msgT = setTimeout(function () { $('msg').textContent = ''; }, 8000); }
+
+  /* ---------- images ---------- */
+  function shrink(file) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onerror = rej;
+      r.onload = function () {
+        var im = new Image();
+        im.onerror = rej;
+        im.onload = function () {
+          var s = Math.min(1, 1000 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+          c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+          var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+          x.drawImage(im, 0, 0, c.width, c.height);
+          c.toBlob(function (b) { b ? res(b) : rej(); }, 'image/jpeg', 0.85);
+        };
+        im.src = r.result;
+      };
+      r.readAsDataURL(file);
+    });
+  }
+  function drawPrev() {
+    $('prev').innerHTML = images.map(function (s, i) {
+      return '<div class="' + (i ? '' : 'main') + '" data-i="' + i + '" title="Click to make main"><img src="' + E(s) + '" alt="">' +
+        (i ? '' : '<small>MAIN</small>') + '<button type="button" data-rm="' + i + '" aria-label="Remove image">×</button></div>';
+    }).join('');
+  }
+  $('files').onchange = function () {
+    var fs = [].slice.call(this.files), inp = this;
+    say('Uploading…');
+    Promise.all(fs.map(function (f) { return shrink(f).then(SKY.uploadImage); }))
+      .then(function (d) { images = images.concat(d); drawPrev(); inp.value = ''; say('Uploaded.'); })
+      .catch(function (e) { say(e && e.message ? e.message : 'Could not upload the image.'); });
+  };
+  $('addurl').onclick = function () {
+    var u = $('imgurl').value.trim();
+    if (!/^https?:\/\//i.test(u)) { say('Enter a valid image URL.'); return; }
+    images.push(u); $('imgurl').value = ''; drawPrev();
+  };
+  $('prev').onclick = function (e) {
+    var rm = e.target.getAttribute('data-rm');
+    if (rm !== null) { images.splice(+rm, 1); drawPrev(); return; }
+    var d = e.target.closest('[data-i]');
+    if (d && +d.dataset.i > 0) { images.unshift(images.splice(+d.dataset.i, 1)[0]); drawPrev(); }
+  };
+
+  /* ---------- videos ---------- */
+  function vlabel(v) { var p = SKY.parseVideo(v.url); return p ? (p.kind === 'youtube' ? 'YouTube video' : p.kind === 'vimeo' ? 'Vimeo video' : p.kind === 'drive' ? 'Google Drive video' : 'Video file') : 'Video'; }
+  function drawVids() {
+    $('vids').innerHTML = videos.map(function (v, i) {
+      return '<div class="vrow"><div class="vth">' + (v.thumb ? '<img src="' + E(v.thumb) + '" alt="">' : '') + '<span>▶</span></div>' +
+        '<div class="vinfo"><b>' + E(vlabel(v)) + '</b><small>' + E(v.url.length > 70 ? v.url.slice(0, 70) + '…' : v.url) + '</small></div>' +
+        '<div class="rowbtns"><button type="button" class="xbtn" data-vt="' + i + '">Thumbnail</button><button type="button" class="xbtn del" data-vr="' + i + '">Remove</button></div></div>';
+    }).join('');
+  }
+  /* make a thumbnail from the first second of a video file */
+  function autoThumb(item, src, cross) {
+    var v = document.createElement('video');
+    v.muted = true; v.preload = 'auto'; v.playsInline = true;
+    if (cross) v.crossOrigin = 'anonymous';
+    v.onerror = function () {};
+    v.onloadedmetadata = function () { try { v.currentTime = Math.min(1, (v.duration || 2) / 4); } catch (e) {} };
+    v.onseeked = function () {
+      try {
+        var s = Math.min(1, 800 / Math.max(v.videoWidth, v.videoHeight)), c = document.createElement('canvas');
+        c.width = Math.round(v.videoWidth * s); c.height = Math.round(v.videoHeight * s);
+        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(function (b) {
+          if (!b) return;
+          SKY.uploadImage(b).then(function (u) { item.thumb = u; drawVids(); }).catch(function () {});
+        }, 'image/jpeg', 0.82);
+      } catch (e) {}
+    };
+    v.src = src;
+  }
+  $('addvid').onclick = function () {
+    var u = $('vidurl').value.trim(), p = SKY.parseVideo(u);
+    if (!p) { say('Enter a valid video link (starting with https://).'); return; }
+    var item = { url: u, kind: p.kind, thumb: p.thumb || '' };
+    videos.push(item); $('vidurl').value = ''; drawVids();
+    if (p.kind === 'file') autoThumb(item, u, true);
+  };
+  $('vidfile').onchange = function () {
+    var f = this.files[0], inp = this; if (!f) return;
+    if (['video/mp4', 'video/webm'].indexOf(f.type) < 0) { say('Only MP4 or WebM videos.'); inp.value = ''; return; }
+    if (f.size > 8 * 1024 * 1024) { say('Video is larger than 8 MB. Use a YouTube / Google Drive link instead.'); inp.value = ''; return; }
+    say('Uploading video…');
+    SKY.uploadVideo(f).then(function (url) {
+      var pv = SKY.parseVideo(url) || {}, item = { url: url, kind: pv.kind || 'file', thumb: pv.thumb || '' };
+      videos.push(item); drawVids(); say('Video uploaded.');
+      autoThumb(item, URL.createObjectURL(f), false);
+    }).catch(function (e) { say(e && e.message ? e.message : 'Could not upload the video.'); });
+    inp.value = '';
+  };
+  $('vids').onclick = function (e) {
+    var t = e.target.getAttribute('data-vt'), r = e.target.getAttribute('data-vr');
+    if (r !== null) { videos.splice(+r, 1); drawVids(); }
+    if (t !== null) { thumbFor = +t; $('vthumb').click(); }
+  };
+  $('vthumb').onchange = function () {
+    var f = this.files[0], inp = this, item = videos[thumbFor]; if (!f || !item) return;
+    say('Uploading thumbnail…');
+    shrink(f).then(SKY.uploadImage).then(function (u) { item.thumb = u; drawVids(); say('Thumbnail updated.'); })
+      .catch(function (e) { say(e && e.message ? e.message : 'Could not upload the thumbnail.'); });
+    inp.value = '';
+  };
+
+  /* ---------- spec rows ---------- */
+  function addSpec(k, v) {
+    var r = document.createElement('div'); r.className = 'specrow';
+    r.innerHTML = '<input placeholder="Label (e.g. Payload)" value="' + E(k || '') + '"><input placeholder="Value (e.g. 1485 kg)" value="' + E(v || '') + '"><button type="button" aria-label="Remove spec">×</button>';
+    r.lastChild.onclick = function () { r.remove(); };
+    $('specs').appendChild(r);
+  }
+  $('addspec').onclick = function () { addSpec(); };
+
+  /* ---------- form ---------- */
+  function clearForm() {
+    editing = null; images = []; videos = []; $('pf').reset(); $('specs').innerHTML = ''; addSpec();
+    drawPrev(); drawVids(); $('ftitle').textContent = 'Add New Product'; $('savebtn').textContent = 'Save Product'; $('cancel').hidden = true;
+  }
+  $('cancel').onclick = clearForm;
+
+  $('pf').onsubmit = function (e) {
+    e.preventDefault();
+    if (!images.length) { say('Add at least one image.'); return; }
+    var specs = [].map.call($('specs').children, function (r) {
+      return [r.children[0].value.trim(), r.children[1].value.trim()];
+    }).filter(function (s) { return s[0] && s[1]; });
+
+    var p = { name: $('name').value.trim(), price: parseFloat($('price').value) || 0, priceNote: $('pnote').value.trim(), booking: parseFloat($('book').value) || 0, description: $('desc').value.trim(), images: images.slice(), videos: videos.map(function (v) { return { url: v.url, kind: v.kind, thumb: v.thumb || '' }; }), specs: specs };
+    var prev = list.slice();
+    if (editing) {
+      var o = list.filter(function (x) { return x.id === editing; })[0];
+      p.id = o.id; p.createdAt = o.createdAt;
+      list = list.map(function (x) { return x.id === editing ? p : x; });
+    } else {
+      var base = SKY.slugify(p.name), id = base, n = 2;
+      while (list.some(function (x) { return x.id === id; })) id = base + '-' + n++;
+      p.id = id; p.createdAt = Date.now();
+      list.push(p);
+    }
+    var wasEdit = !!editing; $('savebtn').disabled = true;
+    SKY.save(list).then(function (r) {
+      $('savebtn').disabled = false;
+      if (!r.ok) { list = prev; say(r.d.error || 'Could not save. Try again.'); return; }
+      say(wasEdit ? 'Product updated for everyone.' : 'Product added for everyone.');
+      clearForm(); draw();
+    });
+  };
+
+  /* ---------- product list ---------- */
+  function draw() {
+    var sorted = SKY.newest(list), top = sorted.slice(0, 3).map(function (p) { return p.id; });
+    $('total').textContent = '(' + list.length + ')';
+    $('items').innerHTML = sorted.length ? sorted.map(function (p) {
+      return '<div class="list-item"><img src="' + E(p.images[0] || '') + '" alt=""><div><b>' + E(p.name) +
+        (top.indexOf(p.id) > -1 ? '<span class="badge">On home page</span>' : '') + '</b><small>' + SKY.money(p.price) + ' · ' +
+        new Date(p.createdAt).toLocaleDateString('en-AU') + '</small></div><div class="rowbtns">' +
+        '<a class="xbtn" style="padding:6px 10px;display:inline-block" href="product.html?id=' + encodeURIComponent(p.id) + '" target="_blank" rel="noopener">View</a>' +
+        '<button class="xbtn" data-edit="' + E(p.id) + '">Edit</button><button class="xbtn del" data-del="' + E(p.id) + '">Delete</button></div></div>';
+    }).join('') : '<p class="empty">No products yet.</p>';
+  }
+  $('items').onclick = function (e) {
+    var ed = e.target.getAttribute('data-edit'), dl = e.target.getAttribute('data-del');
+    if (ed) {
+      var p = list.filter(function (x) { return x.id === ed; })[0]; if (!p) return;
+      editing = ed; images = p.images.slice();
+      $('name').value = p.name; $('price').value = p.price; $('pnote').value = p.priceNote || ''; $('book').value = p.booking || ''; $('desc').value = p.description || '';
+      $('specs').innerHTML = ''; (p.specs.length ? p.specs : [['', '']]).forEach(function (s) { addSpec(s[0], s[1]); });
+      videos = (p.videos || []).map(function (v) { return { url: v.url, kind: v.kind, thumb: v.thumb || '' }; }); drawPrev(); drawVids(); $('ftitle').textContent = 'Edit Product'; $('savebtn').textContent = 'Update Product'; $('cancel').hidden = false;
+      $('pf').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (dl && confirm('Delete this product for everyone? This cannot be undone.')) {
+      var before = list; list = list.filter(function (x) { return x.id !== dl; });
+      SKY.save(list).then(function (r) {
+        if (!r.ok) { list = before; say(r.d.error || 'Could not delete.'); }
+        else if (editing === dl) clearForm();
+        draw();
+      });
+    }
+  };
+
+  /* ---------- backup tools ---------- */
+  $('rst').onclick = function () {
+    if (!confirm('Reset to the default product? This removes every product you added, for everyone.')) return;
+    var prev = list; list = SKY.defaults();
+    SKY.save(list).then(function (r) {
+      if (!r.ok) { list = prev; say(r.d.error || 'Could not reset.'); }
+      clearForm(); draw();
+    });
+  };
+
+  clearForm();
+  SKY.loadAdmin().then(function (l) { list = l; show(); });
+})();
+</script>
+</body>
+</html>
