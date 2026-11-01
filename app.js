@@ -4,9 +4,7 @@
 
   var WHATSAPP = "61428796970"; // <- WhatsApp number, digits only with country code
   var CDN = "https://dao000pg6obv7.cloudfront.net/wp-content/uploads";
-    var LOGO = "/images/logo.png";
-  var LOGO_VIDEO = "/images/newLogo.webm";
-
+    var LOGO = "/images/logo.jpeg";
   /* DEFAULT product – shown only while the database is still empty/new, or if the server can't be reached */
    var SEED = [
     {
